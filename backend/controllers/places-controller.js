@@ -1,34 +1,7 @@
 const { validationResult } = require("express-validator");
-const { v4: uuid } = require("uuid");
 const HttpError = require("../models/http-error");
 const getCoordinatesByAddress = require("../util/location");
 const Place = require("../models/place");
-let DUMMY_PLACES = [
-  {
-    id: 'p1',
-    title: 'Empire state building',
-    description: 'One of the most famous sky scrapers in the world!',
-    imageUrl: 'https://newyorkyimby.com/wp-content/uploads/2020/09/DSCN0762-260x347.jpg',
-    address: '20 W 34th St., New York, NY 10001, United States',
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878531
-    },
-    creator: 'u1'
-  },
-  {
-    id: 'p2',
-    title: 'Empire state building',
-    description: 'One of the most famous sky scrapers in the world!',
-    imageUrl: 'https://newyorkyimby.com/wp-content/uploads/2020/09/DSCN0762-260x347.jpg',
-    address: '20 W 34th St., New York, NY 10001, United States',
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878531
-    },
-    creator: 'u2'
-  }
-];
 
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
@@ -91,7 +64,7 @@ const createPlace = async (req, res, next) => {
 const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError("Invalild inputs, please check the data you provided", 422);
+    return next(new HttpError("Invalild inputs, please check the data you provided", 422));
   }
   const { title, description } = req.body;
   const placeId = req.params.pid;

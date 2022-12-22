@@ -1,6 +1,8 @@
 const { validationResult } = require("express-validator");
-const {v4: uuid} = require("uuid");
+const { v4: uuid } = require("uuid");
 const HttpError = require("../models/http-error");
+const User = require("../models/user");
+
 const DUMMY_USERS = [
   {
     id: "u1",
@@ -14,32 +16,52 @@ const getUsers = (req, res, next) => {
   res.status(200).json({ users: DUMMY_USERS });
 }
 
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError("Invalild inputs, please check the data you provided", 422); 
+    return next(new HttpError("Invalild inputs, please check the data you provided", 422));
   }
-  const { name, email, password } = req.body;
-  if (DUMMY_USERS.find(user => user.email === email)) {
-    throw new HttpError("Error: A user with the given email is already exist", 422);
+  const { name, email, password, places } = req.body;
+
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email });
+  } catch (error) {
+    return next(new HttpError("Could not Sign up, Please try again later.", 500));
   }
-  const newUser = {
-    id: uuid(),
+
+  if (existingUser) {
+    return next(new HttpError("A user with the given email address is already exist!", 422));
+  }
+
+  const newUser = new User({
     name,
     email,
-    password
-  };
-  DUMMY_USERS.push(newUser);
+    image: "https://static.generated.photos/vue-static/home/feed/latino-male.png",
+    password,
+    places
+  });
+  try {
+    await newUser.save();
+  } catch (error) {
+    return next(new HttpError("Could not Sign up, Please try again later."), 500);
+  }
   res.status(201).json({ user: newUser });
 }
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
-  const user = DUMMY_USERS.find(user => user.email === email);
-  if (!user || user.password !== password) {
-    throw new HttpError("Error: Email or password are wrong.", 401);
+
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email });
+  } catch (error) {
+    return next(new HttpError("Could not login, Please try again later.", 500));
   }
-  
+
+  if (!existingUser || existingUser.password !== password) {
+    return next(new HttpError("Login failed: Wrong email or password.", 401));
+  }
   res.json({ message: "Logged In" });
 }
 
