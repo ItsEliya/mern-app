@@ -88,7 +88,7 @@ const createPlace = async (req, res, next) => {
   res.status(201).json({ place: newPlace });
 }
 
-const updatePlace = (req, res, next) => {
+const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new HttpError("Invalild inputs, please check the data you provided", 422);
@@ -96,22 +96,26 @@ const updatePlace = (req, res, next) => {
   const { title, description } = req.body;
   const placeId = req.params.pid;
 
-  const updatedPlace = { ...DUMMY_PLACES.find(p => p.id === placeId) };
-  const placeIndex = DUMMY_PLACES.findIndex(p => p.id === placeId);
-  updatedPlace.title = title;
-  updatedPlace.description = description;
-
-  DUMMY_PLACES[placeIndex] = updatedPlace;
-
-  res.status(200).json({ place: updatedPlace });
+  let result;
+  try {
+    result = await Place.findByIdAndUpdate(placeId, { title, description });
+  } catch (error) {
+    return next(new HttpError("Cannot update place, Please try again later.", 500));
+  }
+  res.status(200).json({ message: "Place updated" });
 }
 
-const deletePlace = (req, res, next) => {
-  if (!DUMMY_PLACES.find(place => place.id === req.params.id)) {
-    throw new HttpError("Could not find a place with the given id", 404);
+const deletePlace = async (req, res, next) => {
+  let result;
+  try {
+    result = await Place.findByIdAndDelete(req.params.pid);
+  } catch (error) {
+    return next(new HttpError("Could not deleted place.", 500));
   }
-  DUMMY_PLACES = DUMMY_PLACES.filter(p => p.id !== req.params.pid);
-  res.status(200).json({ message: "Place Deleted." });
+  if (!result) {
+    return next(new HttpError("Error: Could not find a place with the given id", 422));
+  }
+  res.status(200).json({ result });
 }
 
 exports.getPlaceById = getPlaceById;
