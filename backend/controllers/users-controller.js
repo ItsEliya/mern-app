@@ -3,14 +3,6 @@ const { v4: uuid } = require("uuid");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
 
-const DUMMY_USERS = [
-  {
-    id: "u1",
-    name: "Eliya Noah",
-    email: "eliyanoah70@gmail.com",
-    password: "Aa123456"
-  }
-]
 
 const getUsers = async (req, res, next) => {
   let users;
@@ -27,7 +19,7 @@ const signup = async (req, res, next) => {
   if (!errors.isEmpty()) {
     return next(new HttpError("Invalild inputs, please check the data you provided", 422));
   }
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
   try {
@@ -45,7 +37,7 @@ const signup = async (req, res, next) => {
     email,
     image: "https://static.generated.photos/vue-static/home/feed/latino-male.png",
     password,
-    places
+    places: []
   });
   try {
     await newUser.save();
