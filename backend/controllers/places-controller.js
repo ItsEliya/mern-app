@@ -23,15 +23,15 @@ const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
   let userPlaces = [];
   try {
-    userPlaces = await Place.find({ creator: userId });
+    userPlaces = await User.findById(userId).populate("places");
   } catch (error) {
     return next(new HttpError("Something went wrong, could not find places.", 500));
   }
 
-  if (!userPlaces || userPlaces.length === 0) {
+  if (!userPlaces || userPlaces.places.length === 0) {
     return next(new HttpError("Could not find a place for the provided user id", 404));
   }
-  res.json(userPlaces);
+  res.json({places: userPlaces.places});
 }
 
 const createPlace = async (req, res, next) => {
