@@ -60,7 +60,7 @@ const login = async (req, res, next) => {
   if (!existingUser || existingUser.password !== password) {
     return next(new HttpError("Login failed: Wrong email or password.", 401));
   }
-  res.json({ message: "Logged In" });
+  res.json({ user: existingUser });
 }
 
 exports.getUsers = getUsers;
