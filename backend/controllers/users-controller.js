@@ -48,8 +48,8 @@ const signup = async (req, res, next) => {
 }
 
 const login = async (req, res, next) => {
-  const { email, password } = req.body;
-
+  let { email, password } = req.body;
+  email = email.toLowerCase();
   let existingUser;
   try {
     existingUser = await User.findOne({ email });
