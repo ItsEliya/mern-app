@@ -64,7 +64,7 @@ export default function Auth() {
           {
             "Content-Type": "application/json"
         })   
-        authCtx.login(data.user._id);   
+        authCtx.login(data.userId, data.token);   
       } catch (err) {
       }
     } else {
@@ -78,7 +78,7 @@ export default function Auth() {
           "POST",
           formData
         );
-        authCtx.login(data.user._id);
+        authCtx.login(data.userId, data.token);
       } catch (error) {
       }
     }

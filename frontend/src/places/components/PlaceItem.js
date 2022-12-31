@@ -29,7 +29,9 @@ export default function PlaceItem(props) {
   async function deletePlace() {
     setShowDeleteWarning(false);
     try {
-      await sendRequest(`http://localhost:5000/api/places/${props.id}`, "DELETE");
+      await sendRequest(`http://localhost:5000/api/places/${props.id}`, "DELETE", null, {
+        "Authorization": "Bearer " + authCtx.token
+      });
       props.onDelete(props.id);
     } catch (err) {
       

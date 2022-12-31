@@ -1,8 +1,8 @@
 const { validationResult } = require("express-validator");
-const { v4: uuid } = require("uuid");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
-
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const getUsers = async (req, res, next) => {
   let users;
@@ -31,12 +31,18 @@ const signup = async (req, res, next) => {
   if (existingUser) {
     return next(new HttpError("A user with the given email address is already exist!", 422));
   }
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (error) {
+    return next(new HttpError("Could not create user, please try again later.", 500));
+  }
 
   const newUser = new User({
     name,
     email,
     image: req.file.path,
-    password,
+    password: hashedPassword,
     places: []
   });
   try {
@@ -44,7 +50,14 @@ const signup = async (req, res, next) => {
   } catch (error) {
     return next(new HttpError("Could not Sign up, Please try again later."), 500);
   }
-  res.status(201).json({ user: newUser });
+  let token;
+  try {
+    token = jwt.sign({ userId: newUser.id, email: newUser.email}, "bipbip_its_a_secret", { expiresIn: "1h" });
+  } catch (error) {
+    return next(new HttpError("Could not Sign up, Please try again later."), 500);
+  }
+
+  res.status(201).json({ userId: newUser.id, email: newUser.email, token });
 }
 
 const login = async (req, res, next) => {
@@ -57,10 +70,27 @@ const login = async (req, res, next) => {
     return next(new HttpError("Could not login, Please try again later.", 500));
   }
 
-  if (!existingUser || existingUser.password !== password) {
-    return next(new HttpError("Login failed: Wrong email or password.", 401));
+  if (!existingUser) {
+    return next(new HttpError("Login failed: Wrong email or password.", 403));
   }
-  res.json({ user: existingUser });
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (error) {
+    return next(new HttpError("Could not login, please try again later.", 500));
+  }
+  if (!isValidPassword) {
+    return next(new HttpError("Login failed: Wrong email or password.", 403));
+  }
+
+  let token;
+  try {
+    token = jwt.sign({ userId: existingUser.id, email: existingUser.email}, "bipbip_its_a_secret", { expiresIn: "1h" });
+  } catch (error) {
+    return next(new HttpError("Could not Sign up, Please try again later."), 500);
+  }
+  res.json({ userId: existingUser.id, email: existingUser.email, token });
 }
 
 exports.getUsers = getUsers;
