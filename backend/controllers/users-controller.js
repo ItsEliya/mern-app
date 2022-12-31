@@ -35,7 +35,7 @@ const signup = async (req, res, next) => {
   const newUser = new User({
     name,
     email,
-    image: "https://static.generated.photos/vue-static/home/feed/latino-male.png",
+    image: req.file.path,
     password,
     places: []
   });

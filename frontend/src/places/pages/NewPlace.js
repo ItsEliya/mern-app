@@ -10,6 +10,7 @@ import { AuthContext } from "../../shared/context/auth-context";
 import ErrorModal from "../../shared/components/UI/ErrorModal";
 import LoadingSpinner from "../../shared/components/UI/LoadingSpinner";
 import { useNavigate } from "react-router-dom";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 
 
 export default function NewPlace() {
@@ -28,6 +29,10 @@ export default function NewPlace() {
     address: {
       value: '',
       isValid: false
+    },
+    image: {
+      value: null,
+      isValid: false
     }
   }, false);
   
@@ -35,18 +40,13 @@ export default function NewPlace() {
   async function submitHandler(event) {
     event.preventDefault();
     try { 
-      await sendRequest("http://localhost:5000/api/places",
-        "POST",
-        JSON.stringify({
-          title: formState.inputs.title.value,
-          description: formState.inputs.description.value,
-          address: formState.inputs.address.value,
-          creator: authCtx.userId
-        }),
-        {
-          "Content-Type": "application/json"
-        }
-      )
+      const formData = new FormData();
+      formData.append("title", formState.inputs.title.value);
+      formData.append("description", formState.inputs.description.value);
+      formData.append("address", formState.inputs.address.value);
+      formData.append("creator", authCtx.userId);
+      formData.append("image", formState.inputs.image.value);
+      await sendRequest("http://localhost:5000/api/places", "POST", formData);
       navigate("/");
     } catch (error) {
       
@@ -83,6 +83,7 @@ export default function NewPlace() {
           validators={[VALIDATOR_MINLENGTH(5)]}
           onInput={inputHandler}
         />
+        <ImageUpload id="image" onInput={inputHandler} errorText="Please provide an image."/>
         <Button type="submit" disabled={!formState.isValid}>ADD PLACE</Button>
       </form>
     </Fragment>
