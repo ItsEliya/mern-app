@@ -9,6 +9,7 @@ import { AuthContext } from "../../shared/context/auth-context";
 import LoadingSpinner from "../../shared/components/UI/LoadingSpinner";
 import ErrorModal from "../../shared/components/UI/ErrorModal";
 import { useHttpClient } from "../../shared/hooks/http-hook";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 
 
 export default function Auth() {
@@ -31,13 +32,18 @@ export default function Auth() {
     if (!isLoginMode) {
       setFormData({
         ...formState.inputs,
-        name: undefined
+        name: undefined,
+        image: undefined
       }, formState.inputs.email.isValid && formState.inputs.password.isValid)
     } else {
       setFormData({
         ...formState.inputs,
         name: {
           value: '',
+          isValid: false
+        },
+        image: {
+          value: null,
           isValid: false
         }
       }, false)
@@ -46,6 +52,7 @@ export default function Auth() {
   }
   async function submitHandler(event) {
     event.preventDefault();
+    
     if (isLoginMode) {
       try {
         const data = await sendRequest("http://localhost:5000/api/users/login", 
@@ -96,6 +103,7 @@ export default function Auth() {
               errorText="Please enter a name."
               onInput={inputHandler}
             />}
+          {!isLoginMode && <ImageUpload center id="image" onInput={inputHandler}/>}
           <Input
             id="email"
             element="input"
