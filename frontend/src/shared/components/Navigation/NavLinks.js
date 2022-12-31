@@ -10,7 +10,7 @@ export default function NavLinks() {
         <NavLink end to='/'>ALL USERS</NavLink>
       </li>
       {authCtx.isLoggedIn && <li>
-        <NavLink to='/u1/places'>MY PLACES</NavLink>
+        <NavLink to={`/${authCtx.userId}/places`}>MY PLACES</NavLink>
       </li>}
       {authCtx.isLoggedIn && <li>
         <NavLink to='/places/new'>ADD PLACE</NavLink>

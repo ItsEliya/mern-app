@@ -19,6 +19,10 @@ export default function UserPlaces() {
     }
     fetchPlaces();
   }, [sendRequest, userId])
+
+  function placeDeletedHandler(id) {
+    setPlaces(prevPlaces => prevPlaces.filter(place => place._id !== id));
+  }
   return (
     <Fragment>
       <ErrorModal error={error} onClear={clearError} />
@@ -27,7 +31,7 @@ export default function UserPlaces() {
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && places && <PlaceList items={places}/>}
+      {!isLoading && places && <PlaceList items={places} onDelete={placeDeletedHandler}/>}
     </Fragment>
   )
 }

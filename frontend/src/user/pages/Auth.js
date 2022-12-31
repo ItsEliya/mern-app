@@ -110,8 +110,8 @@ export default function Auth() {
             element="input"
             type="password"
             label="Password"
-            validators={[VALIDATOR_MINLENGTH(5)]}
-            errorText="Please provide a valid password (at least 5 characters)."
+            validators={[VALIDATOR_MINLENGTH(6)]}
+            errorText="Please provide a valid password (at least 6 characters)."
             onInput={inputHandler}
           />
           <Button type="submit" disabled={!formState.isValid}>{isLoginMode ? 'LOGIN' : 'SIGNUP'}</Button>
