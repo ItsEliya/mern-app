@@ -30,7 +30,7 @@ export default function UpdatePlace() {
   useEffect(() => {
     async function fetchPlace() {
       try {
-        const data = await sendRequest(`http://localhost:5000/api/places/${placeId}`);
+        const data = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/api/places/${placeId}`);
         setPlace(data.place);
         setFormData({
           title: {
@@ -66,7 +66,7 @@ export default function UpdatePlace() {
   async function submitHandler(event) {
     event.preventDefault();
     try {
-      await sendRequest(`http://localhost:5000/api/places/${placeId}`, "PATCH", JSON.stringify({
+      await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/api/places/${placeId}`, "PATCH", JSON.stringify({
         title: formState.inputs.title.value,
         description: formState.inputs.description.value
         }),

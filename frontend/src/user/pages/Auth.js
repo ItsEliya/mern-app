@@ -55,7 +55,7 @@ export default function Auth() {
 
     if (isLoginMode) {
       try {
-        const data = await sendRequest("http://localhost:5000/api/users/login", 
+        const data = await sendRequest(process.env.REACT_APP_BACKEND_URL + "/api/users/login", 
           "POST", 
           JSON.stringify({
             email: formState.inputs.email.value,
@@ -74,7 +74,7 @@ export default function Auth() {
         formData.append("name", formState.inputs.name.value);
         formData.append("password", formState.inputs.password.value);
         formData.append("image", formState.inputs.image.value);
-        const data = await sendRequest("http://localhost:5000/api/users/signup", 
+        const data = await sendRequest(process.env.REACT_APP_BACKEND_URL + "/api/users/signup", 
           "POST",
           formData
         );

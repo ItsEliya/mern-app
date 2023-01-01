@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
     if (!token) {
       throw new HttpError("Authentication failed!", 403);
     }
-    const decodedToken = jwt.verify(token, "bipbip_its_a_secret");
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     req.userData = { userId: decodedToken.userId };
     next();
   } catch (error) {

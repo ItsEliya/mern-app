@@ -12,7 +12,7 @@ export default function UserPlaces() {
   useEffect(() => {
     async function fetchPlaces() {
       try {
-        const data = await sendRequest(`http://localhost:5000/api/places/user/${userId}`);
+        const data = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/api/places/user/${userId}`);
         setPlaces(data.places)
       } catch (error) {
       }
